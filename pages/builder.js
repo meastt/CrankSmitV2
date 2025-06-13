@@ -3,10 +3,10 @@ import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { componentDatabaseV2 } from '../../lib/v2/components';
+import { componentDatabaseV2 } from '../lib/components';
 import { compareSetups } from '../../lib/calculations';
 // pages/v2/builder.js
-import DrivetrainBuilder from '../../components/v2/DrivetrainBuilder';
+import DrivetrainBuilder from '../components/DrivetrainBuilder';
 
 export default function V2Builder() {
   const router = useRouter();

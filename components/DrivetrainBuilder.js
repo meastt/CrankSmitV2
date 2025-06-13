@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { componentDatabaseV2 } from '../../lib/v2/components';
+import { componentDatabaseV2 } from '../lib/components';
 
 const V2ComponentSelector = ({ 
   bikeType, 

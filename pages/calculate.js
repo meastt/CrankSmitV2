@@ -1,5 +1,5 @@
 // pages/api/v2-calculate.js
-import { componentDatabaseV2 } from '../../lib/v2/components';
+import { componentDatabaseV2 } from '../lib/components';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
