@@ -3,9 +3,10 @@ import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import DrivetrainBuilder from '../../components/v2/DrivetrainBuilder';
 import { componentDatabaseV2 } from '../../lib/v2/components';
 import { compareSetups } from '../../lib/calculations';
+// pages/v2/builder.js
+import DrivetrainBuilder from '../../components/v2/DrivetrainBuilder';
 
 export default function V2Builder() {
   const router = useRouter();
@@ -36,72 +37,154 @@ export default function V2Builder() {
     }
   }, []);
 
-  const handleCalculate = async () => {
-    if (!bikeType || !currentSetup.crankset || !currentSetup.cassette || !currentSetup.rearDerailleur) {
-      alert('Please complete all fields including rear derailleur');
+  // Update your pages/v2/builder.js file - replace the handleCalculate function
+
+const handleCalculate = async () => {
+  // Validate all fields are selected
+  if (!bikeType || !currentSetup.crankset || !currentSetup.cassette || !currentSetup.rearDerailleur ||
+      !proposedSetup.crankset || !proposedSetup.cassette || !proposedSetup.rearDerailleur) {
+    alert('Please complete all fields for both current and proposed setups');
+    return;
+  }
+
+  setLoading(true);
+  
+  try {
+    // Convert component IDs to full component objects
+    const getComponent = (components, id) => components.find(c => c.id === id);
+    const availableComponents = {
+      cranksets: componentDatabaseV2.cranksets.filter(c => 
+        [bikeType, ...(bikeType === 'gravel' ? ['mtb'] : [])].includes(c.bikeType)
+      ),
+      cassettes: componentDatabaseV2.cassettes.filter(c => 
+        [bikeType, ...(bikeType === 'gravel' ? ['mtb'] : [])].includes(c.bikeType)
+      ),
+      rearDerailleurs: componentDatabaseV2.rearDerailleurs.filter(c => 
+        [bikeType, ...(bikeType === 'gravel' ? ['mtb'] : [])].includes(c.bikeType)
+      )
+    };
+
+    // Resolve component objects
+    const currentComponents = {
+      crankset: getComponent(availableComponents.cranksets, currentSetup.crankset),
+      cassette: getComponent(availableComponents.cassettes, currentSetup.cassette),
+      rearDerailleur: getComponent(availableComponents.rearDerailleurs, currentSetup.rearDerailleur)
+    };
+
+    const proposedComponents = {
+      crankset: getComponent(availableComponents.cranksets, proposedSetup.crankset),
+      cassette: getComponent(availableComponents.cassettes, proposedSetup.cassette),
+      rearDerailleur: getComponent(availableComponents.rearDerailleurs, proposedSetup.rearDerailleur)
+    };
+
+    // Validate all components were found
+    const missingComponents = [];
+    Object.entries(currentComponents).forEach(([key, comp]) => {
+      if (!comp) missingComponents.push(`current ${key}`);
+    });
+    Object.entries(proposedComponents).forEach(([key, comp]) => {
+      if (!comp) missingComponents.push(`proposed ${key}`);
+    });
+
+    if (missingComponents.length > 0) {
+      alert(`Missing components: ${missingComponents.join(', ')}`);
       return;
     }
 
-    setLoading(true);
+    // Run V2 compatibility checks
+    const currentCompatibility = componentDatabaseV2.compatibilityRules.checkRearDerailleur(
+      currentComponents.rearDerailleur,
+      currentComponents.cassette,
+      currentComponents.crankset
+    );
     
-    try {
-      // Use existing calculation logic but add RD weight
-      const basicResults = compareSetups(currentSetup, proposedSetup);
-      
-      // Add V2 enhancements
-      const currentCompatibility = componentDatabaseV2.compatibilityRules.checkRearDerailleur(
-        currentSetup.rearDerailleur,
-        currentSetup.cassette,
-        currentSetup.crankset
-      );
-      
-      const proposedCompatibility = componentDatabaseV2.compatibilityRules.checkRearDerailleur(
-        proposedSetup.rearDerailleur,
-        proposedSetup.cassette,
-        proposedSetup.crankset
-      );
-      
-      // Enhanced weight calculations
-      const currentTotalWeight = 
-        currentSetup.crankset.weight + 
-        currentSetup.cassette.weight + 
-        currentSetup.rearDerailleur.weight + 
-        257; // chain
-        
-      const proposedTotalWeight = 
-        proposedSetup.crankset.weight + 
-        proposedSetup.cassette.weight + 
-        proposedSetup.rearDerailleur.weight + 
-        257;
-      
-      setResults({
-        ...basicResults,
-        current: {
-          ...basicResults.current,
-          totalWeight: currentTotalWeight,
-          compatibility: currentCompatibility,
-          rearDerailleur: currentSetup.rearDerailleur
-        },
-        proposed: {
-          ...basicResults.proposed,
-          totalWeight: proposedTotalWeight,
-          compatibility: proposedCompatibility,
-          rearDerailleur: proposedSetup.rearDerailleur
-        },
-        comparison: {
-          ...basicResults.comparison,
-          rdWeightChange: proposedSetup.rearDerailleur.weight - currentSetup.rearDerailleur.weight,
-          totalWeightChange: proposedTotalWeight - currentTotalWeight
-        }
+    const proposedCompatibility = componentDatabaseV2.compatibilityRules.checkRearDerailleur(
+      proposedComponents.rearDerailleur,
+      proposedComponents.cassette,
+      proposedComponents.crankset
+    );
+
+    // Calculate comprehensive weights
+    const calculateWeight = (components) => ({
+      crankset: components.crankset.weight,
+      cassette: components.cassette.weight,
+      rearDerailleur: components.rearDerailleur.weight,
+      chain: 257, // Standard chain weight
+      total: components.crankset.weight + components.cassette.weight + components.rearDerailleur.weight + 257
+    });
+
+    const currentWeights = calculateWeight(currentComponents);
+    const proposedWeights = calculateWeight(proposedComponents);
+
+    // Calculate gear ratios for analysis
+    const calculateGearRatios = (crankset, cassette) => {
+      const ratios = [];
+      crankset.teeth.forEach(chainring => {
+        cassette.teeth.forEach(cog => {
+          ratios.push({
+            chainring,
+            cog,
+            ratio: chainring / cog,
+            gearInches: (chainring / cog) * 27, // 700c wheel
+          });
+        });
       });
-      
-    } catch (error) {
-      console.error('Calculation error:', error);
-      alert('Error calculating results');
-    } finally {
-      setLoading(false);
-    }
-  };
+      return ratios.sort((a, b) => a.ratio - b.ratio);
+    };
+
+    const currentGears = calculateGearRatios(currentComponents.crankset, currentComponents.cassette);
+    const proposedGears = calculateGearRatios(proposedComponents.crankset, proposedComponents.cassette);
+
+    // Analyze gear spread
+    const analyzeGears = (gears) => {
+      const ratios = gears.map(g => g.ratio);
+      return {
+        lowest: Math.min(...ratios),
+        highest: Math.max(...ratios),
+        spread: Math.max(...ratios) / Math.min(...ratios),
+        totalGears: ratios.length
+      };
+    };
+
+    const currentAnalysis = analyzeGears(currentGears);
+    const proposedAnalysis = analyzeGears(proposedGears);
+
+    // Mock performance metrics for display
+    const mockMetrics = (analysis) => ({
+      highSpeed: Math.round(analysis.highest * 10), // Mock calculation
+      lowSpeed: Math.round(analysis.lowest * 15),
+    });
+
+    setResults({
+      current: {
+        totalWeight: currentWeights.total,
+        compatibility: currentCompatibility,
+        rearDerailleur: currentComponents.rearDerailleur,
+        gearRange: Math.round(currentAnalysis.spread * 100) / 100,
+        metrics: mockMetrics(currentAnalysis)
+      },
+      proposed: {
+        totalWeight: proposedWeights.total,
+        compatibility: proposedCompatibility,
+        rearDerailleur: proposedComponents.rearDerailleur,
+        gearRange: Math.round(proposedAnalysis.spread * 100) / 100,
+        metrics: mockMetrics(proposedAnalysis)
+      },
+      comparison: {
+        rdWeightChange: proposedWeights.rearDerailleur - currentWeights.rearDerailleur,
+        weightChange: (proposedWeights.crankset + proposedWeights.cassette) - 
+                     (currentWeights.crankset + currentWeights.cassette),
+        totalWeightChange: proposedWeights.total - currentWeights.total
+      }
+    });
+    
+  } catch (error) {
+    console.error('V2 Calculation error:', error);
+    alert(`Error calculating results: ${error.message}`);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <>
