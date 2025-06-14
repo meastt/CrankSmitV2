@@ -12,7 +12,7 @@ const V2ComponentSelector = ({
   const [compatibilityMode, setCompatibilityMode] = useState(true);
   const [filterBrand, setFilterBrand] = useState('all');
   const [filterSpeedCount, setFilterSpeedCount] = useState('all');
-  const [sortBy, setSortBy] = useState('weight'); // weight, price, performance
+  const [sortBy, setSortBy] = useState('weight');
 
   // Get available components based on bike type
   const getAvailableComponents = (type) => {
@@ -28,7 +28,7 @@ const V2ComponentSelector = ({
 
   const availableComponents = getAvailableComponents(bikeType);
 
-  // Professional Component Card with detailed specs
+  // Component Card with dark theme
   const ComponentCard = ({ component, type, isSelected, onSelect, compatibility }) => {
     const getBrandColor = (model) => {
       if (model.includes('Shimano')) return '#0066CC';
@@ -51,9 +51,13 @@ const V2ComponentSelector = ({
         onClick={() => onSelect(component)}
         className={`relative cursor-pointer transition-all duration-200 rounded-lg border-2 p-4 ${
           isSelected 
-            ? 'border-blue-500 bg-blue-50 shadow-lg scale-105' 
-            : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md'
+            ? 'border-blue-500 shadow-lg scale-105' 
+            : 'border-gray-600 hover:border-gray-500 hover:shadow-md'
         }`}
+        style={{ 
+          background: isSelected ? 'rgba(59, 130, 246, 0.1)' : 'var(--surface-elevated)',
+          color: 'var(--text-primary)'
+        }}
       >
         {/* Compatibility Indicator */}
         {status && (
@@ -73,29 +77,29 @@ const V2ComponentSelector = ({
 
         {/* Component Details */}
         <div className="space-y-2">
-          <h3 className="font-semibold text-gray-900 text-sm leading-tight">
+          <h3 className="font-semibold text-sm leading-tight" style={{ color: 'var(--text-primary)' }}>
             {component.model}
           </h3>
-          <p className="text-gray-600 text-sm">{component.variant}</p>
+          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{component.variant}</p>
           
           {/* Technical Specs Grid */}
           <div className="grid grid-cols-2 gap-2 text-xs mt-3">
             <div>
-              <span className="text-gray-500">Weight:</span>
-              <span className="font-mono ml-1">{component.weight}g</span>
+              <span style={{ color: 'var(--text-tertiary)' }}>Weight:</span>
+              <span className="font-mono ml-1" style={{ color: 'var(--text-secondary)' }}>{component.weight}g</span>
             </div>
             
             {component.speeds && (
               <div>
-                <span className="text-gray-500">Speed:</span>
-                <span className="font-mono ml-1">{component.speeds}</span>
+                <span style={{ color: 'var(--text-tertiary)' }}>Speed:</span>
+                <span className="font-mono ml-1" style={{ color: 'var(--text-secondary)' }}>{component.speeds}</span>
               </div>
             )}
             
             {component.teeth && (
               <div className="col-span-2">
-                <span className="text-gray-500">Range:</span>
-                <span className="font-mono ml-1">
+                <span style={{ color: 'var(--text-tertiary)' }}>Range:</span>
+                <span className="font-mono ml-1" style={{ color: 'var(--text-secondary)' }}>
                   {component.teeth.length === 1 ? 
                     `${component.teeth[0]}T` : 
                     `${component.teeth.join('/')}T`
@@ -107,20 +111,20 @@ const V2ComponentSelector = ({
             {type === 'rearDerailleur' && (
               <>
                 <div>
-                  <span className="text-gray-500">Max Cog:</span>
-                  <span className="font-mono ml-1">{component.maxCog}T</span>
+                  <span style={{ color: 'var(--text-tertiary)' }}>Max Cog:</span>
+                  <span className="font-mono ml-1" style={{ color: 'var(--text-secondary)' }}>{component.maxCog}T</span>
                 </div>
                 <div>
-                  <span className="text-gray-500">Capacity:</span>
-                  <span className="font-mono ml-1">{component.totalCapacity}T</span>
+                  <span style={{ color: 'var(--text-tertiary)' }}>Capacity:</span>
+                  <span className="font-mono ml-1" style={{ color: 'var(--text-secondary)' }}>{component.totalCapacity}T</span>
                 </div>
               </>
             )}
             
             {component.price && (
               <div className="col-span-2">
-                <span className="text-gray-500">Price:</span>
-                <span className="font-mono ml-1 text-green-600">${component.price}</span>
+                <span style={{ color: 'var(--text-tertiary)' }}>Price:</span>
+                <span className="font-mono ml-1 text-green-400">${component.price}</span>
               </div>
             )}
           </div>
@@ -128,17 +132,17 @@ const V2ComponentSelector = ({
           {/* Feature Badges */}
           <div className="flex flex-wrap gap-1 mt-2">
             {component.isElectronic && (
-              <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
+              <span className="px-2 py-1 bg-blue-900 text-blue-300 text-xs rounded">
                 Electronic
               </span>
             )}
             {component.isWireless && (
-              <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded">
+              <span className="px-2 py-1 bg-purple-900 text-purple-300 text-xs rounded">
                 Wireless
               </span>
             )}
             {component.hasClutch && (
-              <span className="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded">
+              <span className="px-2 py-1 bg-orange-900 text-orange-300 text-xs rounded">
                 Clutch
               </span>
             )}
@@ -148,7 +152,7 @@ const V2ComponentSelector = ({
     );
   };
 
-  // Professional Component Selector with Advanced Filtering
+  // Component Selector with dark theme
   const ComponentSelector = ({ title, type, components, selectedComponent, onSelect }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [showFilters, setShowFilters] = useState(false);
@@ -169,7 +173,6 @@ const V2ComponentSelector = ({
         if (sortBy === 'weight') return a.weight - b.weight;
         if (sortBy === 'price') return (a.price || 999) - (b.price || 999);
         if (sortBy === 'performance') {
-          // Custom performance score based on weight and features
           const scoreA = (1000 - a.weight) + (a.isElectronic ? 100 : 0) + (a.hasClutch ? 50 : 0);
           const scoreB = (1000 - b.weight) + (b.isElectronic ? 100 : 0) + (b.hasClutch ? 50 : 0);
           return scoreB - scoreA;
@@ -193,16 +196,21 @@ const V2ComponentSelector = ({
       <div className="space-y-4">
         {/* Header with Controls */}
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+          <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>{title}</h3>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="px-3 py-1.5 text-sm rounded-lg transition-colors"
+              style={{ 
+                border: '1px solid var(--border-subtle)',
+                background: 'var(--surface-elevated)',
+                color: 'var(--text-secondary)'
+              }}
             >
               Filters {showFilters ? '▲' : '▼'}
             </button>
             {selectedComponent && (
-              <div className="px-3 py-1.5 bg-blue-100 text-blue-800 text-sm rounded-lg">
+              <div className="px-3 py-1.5 bg-blue-900 text-blue-300 text-sm rounded-lg">
                 Selected: {selectedComponent.model}
               </div>
             )}
@@ -211,13 +219,19 @@ const V2ComponentSelector = ({
 
         {/* Advanced Filters */}
         {showFilters && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 bg-gray-50 rounded-lg">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 rounded-lg" 
+               style={{ background: 'var(--surface-primary)' }}>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Brand</label>
+              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Brand</label>
               <select 
                 value={filterBrand} 
                 onChange={(e) => setFilterBrand(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                className="w-full px-3 py-2 rounded-md text-sm"
+                style={{ 
+                  background: 'var(--surface-elevated)',
+                  border: '1px solid var(--border-subtle)',
+                  color: 'var(--text-primary)'
+                }}
               >
                 <option value="all">All Brands</option>
                 <option value="shimano">Shimano</option>
@@ -227,11 +241,16 @@ const V2ComponentSelector = ({
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Speed Count</label>
+              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Speed Count</label>
               <select 
                 value={filterSpeedCount} 
                 onChange={(e) => setFilterSpeedCount(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                className="w-full px-3 py-2 rounded-md text-sm"
+                style={{ 
+                  background: 'var(--surface-elevated)',
+                  border: '1px solid var(--border-subtle)',
+                  color: 'var(--text-primary)'
+                }}
               >
                 <option value="all">All Speeds</option>
                 <option value="11-speed">11-speed</option>
@@ -241,11 +260,16 @@ const V2ComponentSelector = ({
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Sort By</label>
+              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Sort By</label>
               <select 
                 value={sortBy} 
                 onChange={(e) => setSortBy(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                className="w-full px-3 py-2 rounded-md text-sm"
+                style={{ 
+                  background: 'var(--surface-elevated)',
+                  border: '1px solid var(--border-subtle)',
+                  color: 'var(--text-primary)'
+                }}
               >
                 <option value="weight">Weight (Light → Heavy)</option>
                 <option value="price">Price (Low → High)</option>
@@ -254,7 +278,7 @@ const V2ComponentSelector = ({
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Compatibility</label>
+              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>Compatibility</label>
               <label className="flex items-center">
                 <input
                   type="checkbox"
@@ -262,7 +286,7 @@ const V2ComponentSelector = ({
                   onChange={(e) => setCompatibilityMode(e.target.checked)}
                   className="mr-2"
                 />
-                <span className="text-sm">Show warnings</span>
+                <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>Show warnings</span>
               </label>
             </div>
           </div>
@@ -275,9 +299,14 @@ const V2ComponentSelector = ({
             placeholder={`Search ${title.toLowerCase()}...`}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-4 py-2 pl-10 rounded-lg focus:ring-2 focus:ring-blue-500"
+            style={{ 
+              background: 'var(--surface-elevated)',
+              border: '1px solid var(--border-subtle)',
+              color: 'var(--text-primary)'
+            }}
           />
-          <svg className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="absolute left-3 top-2.5 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--text-tertiary)' }}>
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </div>
@@ -297,7 +326,7 @@ const V2ComponentSelector = ({
         </div>
 
         {/* Results Summary */}
-        <div className="text-sm text-gray-600 border-t pt-2">
+        <div className="text-sm border-t pt-2" style={{ color: 'var(--text-tertiary)', borderColor: 'var(--border-subtle)' }}>
           Showing {filteredComponents.length} of {components.length} components
           {sortBy === 'weight' && filteredComponents.length > 0 && (
             <span className="ml-2">• Lightest: {Math.min(...filteredComponents.map(c => c.weight))}g</span>
@@ -307,12 +336,16 @@ const V2ComponentSelector = ({
     );
   };
 
-  // Professional Setup Column
+  // Setup Column with dark theme
   const SetupColumn = ({ title, setup, setSetup, isPrimary = false }) => (
-    <div className={`rounded-xl border-2 p-6 ${isPrimary ? 'border-blue-200 bg-blue-50' : 'border-gray-200 bg-white'}`}>
+    <div className={`rounded-xl border-2 p-6 ${isPrimary ? 'border-blue-500' : ''}`}
+         style={{ 
+           background: isPrimary ? 'rgba(59, 130, 246, 0.1)' : 'var(--surface-primary)',
+           borderColor: isPrimary ? 'var(--accent-blue)' : 'var(--border-subtle)'
+         }}>
       <div className="text-center mb-6">
-        <h2 className="text-xl font-bold text-gray-900">{title}</h2>
-        <p className="text-sm text-gray-600 mt-1">
+        <h2 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>{title}</h2>
+        <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
           {isPrimary ? 'Your current configuration' : 'Test new components'}
         </p>
       </div>
@@ -323,24 +356,29 @@ const V2ComponentSelector = ({
         <div>
           <button
             onClick={() => setActiveSelector(activeSelector === 'crankset' ? null : 'crankset')}
-            className="w-full p-4 border border-gray-300 rounded-lg text-left hover:bg-gray-50 transition-colors"
+            className="w-full p-4 rounded-lg text-left transition-colors"
+            style={{ 
+              border: '1px solid var(--border-subtle)',
+              background: 'var(--surface-elevated)',
+              color: 'var(--text-primary)'
+            }}
           >
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="font-medium text-gray-900">Crankset</h4>
+                <h4 className="font-medium">Crankset</h4>
                 {setup.crankset ? (
-                  <p className="text-sm text-gray-600">{setup.crankset.model} {setup.crankset.variant}</p>
+                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{setup.crankset.model} {setup.crankset.variant}</p>
                 ) : (
-                  <p className="text-sm text-gray-400">Select crankset...</p>
+                  <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>Select crankset...</p>
                 )}
               </div>
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--text-tertiary)' }}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             </div>
           </button>
           {activeSelector === 'crankset' && (
-            <div className="mt-4 border border-gray-200 rounded-lg p-4">
+            <div className="mt-4 rounded-lg p-4" style={{ border: '1px solid var(--border-subtle)', background: 'var(--surface-elevated)' }}>
               <ComponentSelector
                 title="Cranksets"
                 type="crankset"
@@ -359,24 +397,29 @@ const V2ComponentSelector = ({
         <div>
           <button
             onClick={() => setActiveSelector(activeSelector === 'cassette' ? null : 'cassette')}
-            className="w-full p-4 border border-gray-300 rounded-lg text-left hover:bg-gray-50 transition-colors"
+            className="w-full p-4 rounded-lg text-left transition-colors"
+            style={{ 
+              border: '1px solid var(--border-subtle)',
+              background: 'var(--surface-elevated)',
+              color: 'var(--text-primary)'
+            }}
           >
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="font-medium text-gray-900">Cassette</h4>
+                <h4 className="font-medium">Cassette</h4>
                 {setup.cassette ? (
-                  <p className="text-sm text-gray-600">{setup.cassette.model} {setup.cassette.variant}</p>
+                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{setup.cassette.model} {setup.cassette.variant}</p>
                 ) : (
-                  <p className="text-sm text-gray-400">Select cassette...</p>
+                  <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>Select cassette...</p>
                 )}
               </div>
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--text-tertiary)' }}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             </div>
           </button>
           {activeSelector === 'cassette' && (
-            <div className="mt-4 border border-gray-200 rounded-lg p-4">
+            <div className="mt-4 rounded-lg p-4" style={{ border: '1px solid var(--border-subtle)', background: 'var(--surface-elevated)' }}>
               <ComponentSelector
                 title="Cassettes"
                 type="cassette"
@@ -395,24 +438,29 @@ const V2ComponentSelector = ({
         <div>
           <button
             onClick={() => setActiveSelector(activeSelector === 'rearDerailleur' ? null : 'rearDerailleur')}
-            className="w-full p-4 border border-gray-300 rounded-lg text-left hover:bg-gray-50 transition-colors"
+            className="w-full p-4 rounded-lg text-left transition-colors"
+            style={{ 
+              border: '1px solid var(--border-subtle)',
+              background: 'var(--surface-elevated)',
+              color: 'var(--text-primary)'
+            }}
           >
             <div className="flex items-center justify-between">
               <div>
-                <h4 className="font-medium text-gray-900">Rear Derailleur</h4>
+                <h4 className="font-medium">Rear Derailleur</h4>
                 {setup.rearDerailleur ? (
-                  <p className="text-sm text-gray-600">{setup.rearDerailleur.model} {setup.rearDerailleur.variant}</p>
+                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{setup.rearDerailleur.model} {setup.rearDerailleur.variant}</p>
                 ) : (
-                  <p className="text-sm text-gray-400">Select rear derailleur...</p>
+                  <p className="text-sm" style={{ color: 'var(--text-tertiary)' }}>Select rear derailleur...</p>
                 )}
               </div>
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--text-tertiary)' }}>
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             </div>
           </button>
           {activeSelector === 'rearDerailleur' && (
-            <div className="mt-4 border border-gray-200 rounded-lg p-4">
+            <div className="mt-4 rounded-lg p-4" style={{ border: '1px solid var(--border-subtle)', background: 'var(--surface-elevated)' }}>
               <ComponentSelector
                 title="Rear Derailleurs"
                 type="rearDerailleur"
@@ -430,24 +478,24 @@ const V2ComponentSelector = ({
 
       {/* Setup Summary */}
       {setup.crankset && setup.cassette && setup.rearDerailleur && (
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <h4 className="font-medium text-gray-900 mb-3">Configuration Summary</h4>
+        <div className="mt-6 p-4 rounded-lg" style={{ background: 'var(--surface-elevated)' }}>
+          <h4 className="font-medium mb-3" style={{ color: 'var(--text-primary)' }}>Configuration Summary</h4>
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div>
-              <span className="text-gray-500">Total Weight:</span>
-              <span className="font-mono ml-2 font-semibold">
+              <span style={{ color: 'var(--text-tertiary)' }}>Total Weight:</span>
+              <span className="font-mono ml-2 font-semibold" style={{ color: 'var(--text-primary)' }}>
                 {setup.crankset.weight + setup.cassette.weight + setup.rearDerailleur.weight + 257}g
               </span>
             </div>
             <div>
-              <span className="text-gray-500">System:</span>
-              <span className="font-mono ml-2">
+              <span style={{ color: 'var(--text-tertiary)' }}>System:</span>
+              <span className="font-mono ml-2" style={{ color: 'var(--text-secondary)' }}>
                 {setup.rearDerailleur.speeds}
               </span>
             </div>
             <div className="col-span-2">
-              <span className="text-gray-500">Gear Range:</span>
-              <span className="font-mono ml-2">
+              <span style={{ color: 'var(--text-tertiary)' }}>Gear Range:</span>
+              <span className="font-mono ml-2" style={{ color: 'var(--text-secondary)' }}>
                 {Math.min(...setup.crankset.teeth)}/{Math.max(...setup.cassette.teeth)} - {Math.max(...setup.crankset.teeth)}/{Math.min(...setup.cassette.teeth)}
               </span>
             </div>
@@ -461,10 +509,10 @@ const V2ComponentSelector = ({
     <div className="max-w-7xl mx-auto space-y-8">
       {/* Professional Header */}
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">
+        <h1 className="text-3xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
           Professional Drivetrain Configuration
         </h1>
-        <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+        <p className="text-lg max-w-3xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
           Advanced component selection with real-time compatibility validation, 
           intelligent filtering, and expert-grade specifications.
         </p>
@@ -489,13 +537,13 @@ const V2ComponentSelector = ({
 
       {/* Global Actions */}
       <div className="flex justify-center gap-4">
-        <button className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors">
+        <button className="px-6 py-3 rounded-lg font-medium transition-colors" style={{ background: 'var(--accent-blue)', color: 'white' }}>
           Analyze Configuration
         </button>
-        <button className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+        <button className="px-6 py-3 rounded-lg font-medium transition-colors" style={{ border: '1px solid var(--border-subtle)', background: 'var(--surface-elevated)', color: 'var(--text-secondary)' }}>
           Save Configuration
         </button>
-        <button className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors">
+        <button className="px-6 py-3 rounded-lg font-medium transition-colors" style={{ border: '1px solid var(--border-subtle)', background: 'var(--surface-elevated)', color: 'var(--text-secondary)' }}>
           Export Report
         </button>
       </div>

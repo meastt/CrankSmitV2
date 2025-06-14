@@ -135,8 +135,9 @@ export default function V2Home() {
               </div>
             </div>
           ) : (
+
             <div className="text-center">
-              <Link href="/v2/builder" className="btn-primary text-lg px-8">
+              <Link href="/builder" className="btn-primary text-lg px-8">
                 Launch Drivetrain Builder →
               </Link>
             </div>
